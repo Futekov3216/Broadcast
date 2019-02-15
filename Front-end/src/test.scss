@@ -1,0 +1,11 @@
+
+@mixin test {   
+    @for $i from 0 through 2 {
+        $x:#{$i + 1}; 
+        .test {
+            background: red;
+            width: 200px;
+            height: 200px;
+        }
+    }
+}
