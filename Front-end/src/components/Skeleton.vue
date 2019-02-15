@@ -38,7 +38,7 @@ export default {
     },
     methods:{
        async sendMsg (){
-           this.allMsgs = []
+        //    this.allMsgs = []
            let info = {
                username: this.Username,
                reciepient: this.Recipient,
@@ -47,25 +47,17 @@ export default {
            console.log(info)
            console.log(this.allMsgs)
             await this.socket.emit('private-message', info);
-            await this.socket.on('add-message', data => {
-                console.log(data)
-                // this.allMsgs = data
-                this.allMsgs.push(data)
-                // console.log(this.allMsgs)
+            await this.socket.on('add-message', info => {
+                console.log(info)
+                this.allMsgs.push(info)
                 })
         },
         async connect(){
-             this.connectMsg = "CONNECTED"
+           this.connectMsg = "CONNECTED"
            await this.socket.emit('add-user', {"username" : this.Username})
            await this.socket.on('add-user', username => {
             console.log(username)
-            // this.allMsgs = sendMsg
         })
-            // await this.socket.emit('sendMsg', '');
-            // await this.socket.on('sendMsg', sendMsg => {
-            //     console.log(sendMsg)
-            //     this.allMsgs = sendMsg
-            //     })
         }   
     }
 

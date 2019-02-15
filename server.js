@@ -30,11 +30,11 @@ io.on('connection', function (socket) {
       socket.on('private-message', function(data){
           console.log("Sending: " + data.msg + " to " + data.reciepient);
           if (clients[data.reciepient] || clients[data.username]){
-            console.log(data)
+            // console.log(clients[data.reciepient].socket)
           io.sockets.connected[clients[data.reciepient].socket].emit("add-message", data);
           io.sockets.connected[clients[data.username].socket].emit("add-message", data);
         } else {
-          console.log("User does not exist: " + data.username); 
+          console.log("User does not exist: " + data.reciepient); 
         }
       });
           socket.on('disconnect', function (res) {
