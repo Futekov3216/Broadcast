@@ -9,11 +9,13 @@
         <sui-input v-model="Recipient" placeholder="Recipient" />
         <textarea v-model="Msg" rows="15" cols="100">TOKA</textarea>
         <sui-button primary @click="sendMsg">SEND MSG</sui-button>
+         <sui-button secondary @click="broadcastMsg">BROADCAST MSG</sui-button>
         <sui-container class="Header">
-        CHAT
+        MESSAGES
         </sui-container>
         <sui-container class="chatContainer">
-             <p v-for="(msg, index) in allMsgs" :key="index">{{msg.username + ' : ' + msg.msg}}</p>
+             <p v-for="(msg, index) in allMsgs" :key="index">{{index + '/' + msg.username + ' : ' + msg.msg}}</p>
+            
         </sui-container>
     </div>
   </div>
@@ -22,7 +24,7 @@
 <script>
 
 import io from 'socket.io-client';
-const host = "localhost" // must be the real ip to work on phones otherwise localhost does the
+const host = "10.10.0.239" // must be the real ip to work on phones otherwise localhost does the
 
 export default {
     data(){
@@ -32,41 +34,53 @@ export default {
             Recipient:'',
             Msg:'',
             allMsgs:[],
-            connectMsg:'ENTER USERNAME AND  CLICK THE BUTTON CONNECT'
+            connectMsg:'ENTER USERNAME AND  CLICK THE BUTTON CONNECT',
+            text:'',
+            info:{
+                username: this.Username,
+               reciepient: this.Recipient,
+               msg: this.Msg
+            }
 
         }
     },
     methods:{
-       async sendMsg (){
-        //    this.allMsgs = []
-           let info = {
+       sendMsg (){
+           let check = true
+           let click = 0;
+           this.info = {
                username: this.Username,
                reciepient: this.Recipient,
                msg: this.Msg
            }
-           console.log(info)
-           console.log(this.allMsgs)
-            await this.socket.emit('private-message', info);
-            await this.socket.on('add-message', info => {
-                console.log(info)
-                this.allMsgs.push(info)
-                })
+            this.socket.emit('private-message', this.info);           
         },
         async connect(){
-           this.connectMsg = "CONNECTED"
+            this.connectMsg = "CONNECTED"
            await this.socket.emit('add-user', {"username" : this.Username})
-           await this.socket.on('add-user', username => {
-            console.log(username)
-        })
+        },
+        broadcastMsg(){
+  
+            this.socket.emit('broadcast', 
+            {  username: this.Username,
+               reciepient: this.Recipient,
+               msg:'THIS IS A BROADCAST MSG :' + this.Msg
+            }
+            )
+ 
         }   
-    }
+    },
+    mounted(){
+           this.socket.on('add-message', async data => {
+                    await this.allMsgs.push(data)
 
-    //     this.socket.on('sendMsg', sendMsg => {
-    //         console.log(sendMsg)
-    //         this.allMsgs = sendMsg
-    //     })
-    // }
-    
+            })
+            this.socket.on('broadcast', async data => {
+                console.log("ama", data)
+                    await this.allMsgs.push(data)
+
+            })
+    }
 } 
 
 </script>
@@ -84,6 +98,12 @@ export default {
 }
 .chatContainer{
     border: 1px solid white;
+     white-space: pre-line; 
+     
+}
+
+.chatContainer pre{
+     white-space: pre-line;
 }
 .wrapper > div > input {
     padding-top: 1%!important;
