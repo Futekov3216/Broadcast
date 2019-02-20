@@ -24,7 +24,7 @@
 <script>
 
 import io from 'socket.io-client';
-const host = "10.10.0.239" // must be the real ip to work on phones otherwise localhost does the
+const host = "localhost" // must be the real ip to work on phones otherwise localhost does the
 
 export default {
     data(){
@@ -76,7 +76,6 @@ export default {
 
             })
             this.socket.on('broadcast', async data => {
-                console.log("ama", data)
                     await this.allMsgs.push(data)
 
             })
